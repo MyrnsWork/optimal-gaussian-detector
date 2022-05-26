@@ -2,7 +2,7 @@
 
 Projet personnel n° 1 :
 
-   Afin d'introduire à la notion de détection optimale selon le critère de Neyman-Pearson, nous nous sommes tout d'abord intéressé à la détection dans du bruit gaussien. Une hypothèse forte du projet est la connaissance parfaite de la matrice de covariance du bruit gaussien. Dans la plupart des cas pratiques, il est nécéssaire d'estimer cette matrice. Ainsi, 4 approches sont étudiées dans ce projet :
+Afin d'introduire à la notion de détection optimale selon le critère de Neyman-Pearson, nous nous sommes tout d'abord intéressé à la détection dans du bruit gaussien. Une hypothèse forte du projet est la connaissance parfaite de la matrice de covariance du bruit gaussien. Dans la plupart des cas pratiques, il est nécéssaire d'estimer cette matrice. Ainsi, 4 approches sont étudiées dans ce projet :
   
   * la cible est parfaitement connue et est déterministe ;
     
