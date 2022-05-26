@@ -14,4 +14,4 @@ Afin d'introduire à la notion de détection optimale selon le critère de Neyma
 
 À noter que le stering vector est parfaitement connu et est déterministe dans cette étude.
 
-*Pour plus de renseignements, l'ensemble de la théorie abordée est disponible sur le site personnel de Maria S. Greco ([lien](http://www.iet.unipi.it/m.greco/esami_lab/Radar/Gauss_det.pdf)).*
+*Pour plus de renseignements, l'ensemble de la théorie abordée est disponible sur le site personnel de Maria S. Greco ([lien1](http://www.iet.unipi.it/m.greco/esami_lab/Radar/Gauss_det.pdf) et [lien2](http://www.iet.unipi.it/m.greco/esami_lab/Radar/Detection_in_Gaussian_clutter.pdf)).*
