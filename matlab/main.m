@@ -5,7 +5,7 @@ clear;
 dbstop if error;
 
 %% Options du script
-displayFigures = 0;
+displayFigures = true;
 useIHM         = 0;
 
 %% Hyperparamètres
@@ -16,7 +16,7 @@ Pfa = 1e-4;                                                                % pro
 %% Paramètres
 % géométrie des cartes
 Nrec  = 64;                                                                % nombre de récurrences, 1x1
-Ncd   = 1000;                                                              % nombre de cases distance, 1x1
+Ncd   = 100;                                                               % nombre de cases distance-, 1x1
 Ncell = Nrec * Ncd;                                                        % nombre de cellules, 1x1
 
 % radar
@@ -36,9 +36,9 @@ Pbth_dB  = 10*log10( Pbth_lin );
 R        = Pbth_lin * eye(Nrec);                                           % matrice de covariance du bruit thermique, Nrec x Nrec
 
 % caractéristiques de la cible
-SNR_dB          = 0;                                                       % rapport signal sur bruit, 1x1                                                                          
+SNR_dB          = 9;                                                       % rapport signal sur bruit, 1x1                                                                          
 SNR_lin         = 10^( SNR_dB/10 );
-typeTarget      = "swerling1";                                             % type de fluctuations de la cible, 1x1   
+typeTarget      = "swerling0";                                             % type de fluctuations de la cible, 1x1   
 speedTarget     = 5;                                                       % vitesse radiale de la cible, 1x1 [m/s]   
 targetFrequency = 2 * speedTarget / lambda;                                % fréquence Doppler de la cible, 1x1 [Hz]   
 
@@ -66,8 +66,10 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
   imagettePuissanceWithTarget_lin,...
   rangeIndex                         ] = addTarget( imagetteChannelIQ_lin,...
                                                     targetIQ,...
-                                                    1                        );                            
-
+                                                    1                        );
+figure(4),
+imagesc(10*log10(fftshift(abs(fft(imagetteChannelIQWithTarget_lin, [], 1)), 1))'), hold on
+plot(mod(round((targetFrequency/PRF+0.5)*Nrec), Nrec) + 1, rangeIndex,'ro')
 %% Détecteur optimal
 [ logLRT_lin,...
   detectionMap,...
