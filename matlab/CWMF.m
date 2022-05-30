@@ -12,7 +12,7 @@ Pfa = 1e-4;                                                                % pro
 %% Paramètres
 % géométrie des cartes
 Nrec  = 64;                                                                % nombre de récurrences, 1x1
-Ncd   = 100;                                                               % nombre de cases distance, 1x1
+Ncd   = 1000;                                                              % nombre de cases distance, 1x1
 Ncell = Nrec * Ncd;                                                        % nombre de cellules, 1x1
 
 % radar
@@ -32,9 +32,9 @@ Pbth_dB  = 10*log10( Pbth_lin );
 R        = Pbth_lin * eye(Nrec);                                           % matrice de covariance du bruit thermique, Nrec x Nrec
 
 % caractéristiques de la cible
-SNR_dB          = 10;                                                      % rapport signal sur bruit, 1x1                                                                          
+SNR_dB          = 0;                                                       % rapport signal sur bruit, 1x1                                                                          
 SNR_lin         = 10^( SNR_dB/10 );
-typeTarget      = "swerling1";                                             % type de fluctuations de la cible, 1x1   
+typeTarget      = "swerling5";                                             % type de fluctuations de la cible, 1x1   
 speedTarget     = 5;                                                       % vitesse radiale de la cible, 1x1 [m/s]   
 targetFrequency = 2 * speedTarget / lambda;                                % fréquence Doppler de la cible, 1x1 [Hz]   
 
@@ -73,7 +73,7 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
                                        targetIQ,...
                                        steringVector,...
                                        typeTarget,...
-                                       1                                  );    
+                                       1                                  ) ;    
 
 
 %% Figures
@@ -82,7 +82,7 @@ fig1 = displayImagettes( imagettePuissance_lin,...
                          detectionMap,...
                          rangeIndex,...
                          Nrec,...
-                         1                        );     
+                         1                                  );     
 
 
 fig2 = displayHistogram( imagetteAmplitude_lin,...
@@ -133,17 +133,38 @@ function [ targetIQ,...
             steringVector   = exp( 1j*2*pi * targetFrequency * t);
             targetIQ        = targetAmplitude .* steringVector; 
 
-        case "swerling1"
+        case "swerling1"                                                   % amplitude suivant une loi de Rayleigh, phase suivant une loi uniforme
             targetPower     = SNR_lin * Pbth_lin;
             sigmaTarget     = sqrt( targetPower/2 );
             targetAmplitude = sigmaTarget * ( randn + 1j*randn );          % hypothèse : le tirage d'ampltitude est 
-                                                                           % constant sur le temps d'intégration (Tint =9 Nrec/PRF )
+                                                                           % constant sur le temps d'intégration (Tint = Nrec/PRF )
             t               = (0 : Nrec-1)' * 1/PRF;  
             steringVector   = exp( 1j*2*pi * targetFrequency * t);
             targetIQ        = targetAmplitude .* steringVector;   
 
+        case {"swerling0", "swerling5"}                                    % amplitude constante, phase suivant une loi uniforme
+            targetPower     = SNR_lin * Pbth_lin;
+            Phi             = 2 * pi * rand;                               % phase aléatoire uniforme sur l'intervalle [0;2pi]
+            sigmaTarget     = sqrt( targetPower/2 );
+            targetAmplitude = sigmaTarget * exp(1j*Phi);                   % hypothèse : le tirage d'ampltitude est 
+                                                                           % constant sur le temps d'intégration (Tint = Nrec/PRF )
+            t               = (0 : Nrec-1)' * 1/PRF;  
+            steringVector   = exp( 1j*2*pi * targetFrequency * t);
+            targetIQ        = targetAmplitude .* steringVector;   
+
+       case "unknow"
+            SNR_dB          = rand * 30 - 5;
+            SNR_lin         = 10^( SNR_dB/10 );
+            targetPower     = SNR_lin * Pbth_lin;                          % amplitude déterministe et inconnue
+            sigmaTarget     = sqrt( targetPower/2 );
+            targetAmplitude = sigmaTarget * ( randn + 1j*randn );          % hypothèse : le tirage d'ampltitude est 
+                                                                           % constant sur le temps d'intégration (Tint = Nrec/PRF )
+            t               = (0 : Nrec-1)' * 1/PRF;  
+            steringVector   = exp( 1j*2*pi * targetFrequency * t);
+            targetIQ        = targetAmplitude .* steringVector;               
+
         otherwise
-            errror( "type de cible inconnu ou non supporté" );
+            error( "type de cible inconnu ou non supporté" );
     end
 
                                
@@ -210,14 +231,14 @@ function [ logLRT_lin,...
             gammaLogLRT_lin           = sigma0 * qfuncinv(Pfa);
             gammaLogLRT_dB            = 10 * log10(gammaLogLRT_lin);  
             
-        case "swerling1"
+          case {"swerling1", "swerling0", "swerling5", "unknow"}  
             logLRT_lin(:, iRangeGate) = abs(steringVector' * (R \ imagetteChannelIQ_lin(:, iRangeGate)) ).^2;
             sigma0                    = real( steringVector' * (R \ steringVector) );                           % partie réelle uniquement (à cause des erreurs numériques)
             gammaLogLRT_lin           = -sigma0 * log( Pfa );
             gammaLogLRT_dB            = 10 * log10(gammaLogLRT_lin);  
 
         otherwise
-            errror( "type de cible inconnu ou non supporté" );
+            error( "type de cible inconnu ou non supporté" );
 
       end
 
@@ -274,7 +295,7 @@ function fig = displayLogLRT( logLRT_lin,...
                               Ncd,...
                               iFigure           )
 
-    fig = figure(iFigure);
+    fig = figure( iFigure );
     plot( 10*log10( abs( logLRT_lin(1,:) ) ), 'LineWidth', 1.5 ), hold on;
     plot( gammaLogLRT_dB * ones(1, Ncd), 'LineWidth', 1.5 ), hold off;
     legend( "LogLRT", "Seuil Optimal" )
