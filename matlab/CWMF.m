@@ -4,6 +4,10 @@ close all;
 clear;
 dbstop if error;
 
+%% Options du script
+displayFigures = 0;
+useIHM         = 0;
+
 %% Hyperparamètres
 kB  = 1.38e-23;                                                            % constante de Boltzmann, 1x1 [m2 kg s-2 K-1]
 c   = 3e8;                                                                 % célérité de la lumière, 1x1 [m/s]
@@ -34,7 +38,7 @@ R        = Pbth_lin * eye(Nrec);                                           % mat
 % caractéristiques de la cible
 SNR_dB          = 0;                                                       % rapport signal sur bruit, 1x1                                                                          
 SNR_lin         = 10^( SNR_dB/10 );
-typeTarget      = "swerling5";                                             % type de fluctuations de la cible, 1x1   
+typeTarget      = "swerling1";                                             % type de fluctuations de la cible, 1x1   
 speedTarget     = 5;                                                       % vitesse radiale de la cible, 1x1 [m/s]   
 targetFrequency = 2 * speedTarget / lambda;                                % fréquence Doppler de la cible, 1x1 [Hz]   
 
@@ -77,27 +81,28 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
 
 
 %% Figures
-fig1 = displayImagettes( imagettePuissance_lin,...
-                         imagettePuissanceWithTarget_lin,...
-                         detectionMap,...
-                         rangeIndex,...
-                         Nrec,...
-                         1                                  );     
+if displayFigures
+    fig1 = displayImagettes( imagettePuissance_lin,...
+                             imagettePuissanceWithTarget_lin,...
+                             detectionMap,...
+                             rangeIndex,...
+                             Nrec,...
+                             1                                  );     
+    
+    
+    fig2 = displayHistogram( imagetteAmplitude_lin,...
+                             imagettePuissance_lin,...
+                             Pbth_lin,...
+                             2                        );
+                         
+    
+    
+    fig3 = displayLogLRT( logLRT_lin,...
+                          gammaLogLRT_dB,...
+                          Ncd,...
+                          3                 );                 
 
-
-fig2 = displayHistogram( imagetteAmplitude_lin,...
-                         imagettePuissance_lin,...
-                         Pbth_lin,...
-                         2                        );
-                     
-
-
-fig3 = displayLogLRT( logLRT_lin,...
-                      gammaLogLRT_dB,...
-                      Ncd,...
-                      3                 );                 
-
-
+end
                       
 
 
@@ -208,43 +213,39 @@ function [ logLRT_lin,...
                                                 typeTarget,...
                                                 dimensionRec             )
                                
+   switch typeTarget
+
+     case "deterministic"
+        logLRT_lin      = 2 * real( pagemtimes(targetIQ'/R, imagetteChannelIQ_lin) );
+        sigma0          = sqrt( real( 2 * targetIQ' * (R \ targetIQ) ) );
+        gammaLogLRT_lin = sigma0 * qfuncinv(Pfa);
+        gammaLogLRT_dB  = 10 * log10(gammaLogLRT_lin);  
+        
+     case {"swerling1", "swerling0", "swerling5", "unknow"}  
+        logLRT_lin      = abs( pagemtimes(steringVector'/R, imagetteChannelIQ_lin) ).^2;
+        sigma0          = real( steringVector' * (R \ steringVector) );                           % partie réelle uniquement (à cause des erreurs numériques)
+        gammaLogLRT_lin = -sigma0 * log( Pfa );
+        gammaLogLRT_dB  = 10 * log10(gammaLogLRT_lin);  
+
+    otherwise
+        error( "type de cible inconnu ou non supporté" );
+
+   end
+
+   detectionMap = logLRT_lin >= gammaLogLRT_lin;
+
    if dimensionRec == 1                                                      
-       Ncd = size(imagetteChannelIQ_lin, 2);
-%        Nrec = size(imagetteChannelIQ_lin, 1); 
+       Nrec         = size(imagetteChannelIQ_lin, 1); 
+       detectionMap = repmat(detectionMap, Nrec, 1);
+       
       
    elseif dimensionRec == 2
-       Ncd = size(imagetteChannelIQ_lin, 1);
-%        Nrec = size(imagetteChannelIQ_lin, 2); 
-       
+       Nrec         = size(imagetteChannelIQ_lin, 2); 
+       detectionMap = repmat(detectionMap, 1, Nrec);
    else 
        error( "Dimension inconnue ou non supportée" );
        
    end
-   
-   logLRT_lin = zeros( size(imagetteChannelIQ_lin) );
-   for iRangeGate = (1  : Ncd)
-      switch typeTarget
-
-        case "deterministic"
-            logLRT_lin(:, iRangeGate) = 2 * real(targetIQ' * (R \ imagetteChannelIQ_lin(:, iRangeGate)) );
-            sigma0                    = sqrt( real( 2 * targetIQ' * (R \ targetIQ) ) );
-            gammaLogLRT_lin           = sigma0 * qfuncinv(Pfa);
-            gammaLogLRT_dB            = 10 * log10(gammaLogLRT_lin);  
-            
-          case {"swerling1", "swerling0", "swerling5", "unknow"}  
-            logLRT_lin(:, iRangeGate) = abs(steringVector' * (R \ imagetteChannelIQ_lin(:, iRangeGate)) ).^2;
-            sigma0                    = real( steringVector' * (R \ steringVector) );                           % partie réelle uniquement (à cause des erreurs numériques)
-            gammaLogLRT_lin           = -sigma0 * log( Pfa );
-            gammaLogLRT_dB            = 10 * log10(gammaLogLRT_lin);  
-
-        otherwise
-            error( "type de cible inconnu ou non supporté" );
-
-      end
-
-   end
-
-    detectionMap = logLRT_lin >= gammaLogLRT_lin;
 
 end
 
@@ -281,8 +282,13 @@ function fig = displayImagettes( imagettePuissance_lin,...
     %----------------------------------------------------------------------
     subplot 133
     imagesc( detectionMap' ), hold on;
-    plot( (1 : Nrec), rangeTarget * ones(1, Nrec), 'ro' ), hold off; 
-    colorbar, colormap('parula')
+    L = line(ones(2), ones(2), 'LineWidth',2);      
+    cmap = parula(2);  
+    set(L,{'color'},mat2cell(cmap,ones(1,2),3))    
+    plot( (0 : Nrec+1), rangeTarget * ones(1, Nrec+2), 'r', 'LineWidth', 1.5 )
+    hold off           
+    legend( 'non-détection', 'détection', 'index de la cible' )    
+    colormap('parula')
     set(gca, 'YDir', 'normal')
     xlabel('Réccurence')
     ylabel('Distance relative')
@@ -301,6 +307,7 @@ function fig = displayLogLRT( logLRT_lin,...
     legend( "LogLRT", "Seuil Optimal" )
     ylabel('Rapport du log-vraisemblance [dB]')
     xlabel('Distance relative')
+    xlim([1 Inf])
     title('Evolution du rapport de log-vraisemblance [dB]')
     set(fig, 'Units', 'Normalized', 'Position', [0 0 1 1]);
 
