@@ -1,3 +1,9 @@
+% MaÃ«l Laviec
+% mlaviec@enseirb-matmeca.fr
+% ENSEIRB-MATMECA
+% Juin, 2022
+
+
 %% Initialisation
 clc; 
 close all;
@@ -86,7 +92,7 @@ targetFrequency = 2 * speedTarget / lambda;                                % frÃ
 scmR = calcCovarianceMatrix( imagetteChannelIQ_lin,...
                              R,...
                              isCovarianceKown,...
-                             2                                  );
+                             2                        );
 
 
 

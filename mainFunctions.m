@@ -1,3 +1,9 @@
+% Maël Laviec
+% mlaviec@enseirb-matmeca.fr
+% ENSEIRB-MATMECA
+% Juin, 2022
+
+
 %% Initialisation
 clc; 
 close all;
@@ -82,7 +88,7 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
 scmR = calcCovarianceMatrix( imagetteChannelIQ_lin,...
                              R,...
                              isCovarianceKown,...
-                             2                                  );
+                             2                        );
 
 
 %% Détecteur optimal

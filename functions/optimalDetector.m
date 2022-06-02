@@ -1,3 +1,7 @@
+% Maël Laviec
+% mlaviec@enseirb-matmeca.fr
+% ENSEIRB-MATMECA
+% Juin, 2022
 
 function [ logLRT_lin,...
            detectionMap,...
