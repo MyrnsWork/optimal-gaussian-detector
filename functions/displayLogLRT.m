@@ -8,10 +8,12 @@ function fig = displayLogLRT( logLRT_lin,...
     plot( gammaLogLRT_dB * ones(1, Ncd), 'LineWidth', 1.5 ), hold off;
     legend( "LogLRT", "Seuil Optimal" )
     ylabel('Rapport du log-vraisemblance [dB]')
-    xlabel('Distance relative')
+    xlabel('Case distance')
     xlim([1 Inf])
-    title('Evolution du rapport de log-vraisemblance [dB]')
+    title('Evolution du rapport de log-vraisemblance en fonction de la distance [dB]')
     set(fig, 'Units', 'Normalized', 'Position', [0 0 1 1]);
 
 
 end      
+
+

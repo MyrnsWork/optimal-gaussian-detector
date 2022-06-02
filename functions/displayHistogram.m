@@ -1,4 +1,3 @@
-
 function fig = displayHistogram( imagetteAmplitude_lin,...
                                  imagettePuissance_lin,...
                                  Pbth_lin,...
@@ -8,6 +7,8 @@ function fig = displayHistogram( imagetteAmplitude_lin,...
                              
    fig = figure( iFigure );
    set(fig, 'Units', 'Normalized', 'Position', [0 0 1 1]);
+
+   %----------------------------------------------------------------------
    subplot 121
    N    = 1000;
    Pmax = 1 - 1/length( imagetteAmplitude_lin(:) );
@@ -17,11 +18,14 @@ function fig = displayHistogram( imagetteAmplitude_lin,...
                                      
    histogram( imagetteAmplitude_lin(:), 'Normalization', 'pdf'), hold on;
    plot( x, fx, 'LineWidth', 1.5), hold off;
-   xlabel( "Amplitude [V]" );
+   xlabel( "Amplitude" );
    ylabel( "Densité de probabilité" );
-   title( "Densité de probabilité de l'imagette pour P_{bth}=" + string( round( 10*log10(Pbth_lin) ) ) + "dB" ); 
+   legend("Histogramme", "Densité théorique")
+   title( "AMPLITUDE" ); 
+   subtitle( "Densité de probabilité avec P_{bth}=" + string( round( 10*log10(Pbth_lin) ) ) + " dB" );  
    grid on;
-   
+
+   %----------------------------------------------------------------------
    subplot 122
    N    = 1000; 
    Pmax = 1 - 1/length( imagettePuissance_lin(:) );
@@ -31,11 +35,12 @@ function fig = displayHistogram( imagetteAmplitude_lin,...
                                      
    histogram( imagettePuissance_lin(:), 'Normalization', 'pdf'), hold on;
    plot( x, fx, 'LineWidth', 1.5), hold off;
-   xlabel( "Puissance [W]" );
+   xlabel( "Puissance" );
    ylabel( "Densité de probabilité" );
-   title( "Densité de probabilité de l'imagette pour P_{bth}=" + string( round( 10*log10(Pbth_lin) ) ) + "dB" ); 
-   grid on;                             
-                                
-                                
-end
+   title( "PUISSANCE" ); 
+   subtitle( "Densité de probabilité avec P_{bth}= " + string( round( 10*log10(Pbth_lin) ) ) + " dB" );  
+   legend("Histogramme", "Densité théorique")
+   grid on;                        
 
+
+end

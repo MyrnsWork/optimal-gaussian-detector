@@ -7,7 +7,7 @@ function [ logLRT_lin,...
                                                 targetIQ,...
                                                 steringVector,...
                                                 typeTarget,...
-                                                dimensionRec             )
+                                                dimensionFreq           )
                                
    switch typeTarget
 
@@ -28,19 +28,20 @@ function [ logLRT_lin,...
 
    end
 
-   detectionMap = logLRT_lin >= gammaLogLRT_lin;
+   detectionMap = (logLRT_lin >= gammaLogLRT_lin);
 
-   if dimensionRec == 1                                                      
-       Nrec         = size(imagetteChannelIQ_lin, 1); 
-       detectionMap = repmat(detectionMap, Nrec, 1);
-       
-      
-   elseif dimensionRec == 2
-       Nrec         = size(imagetteChannelIQ_lin, 2); 
-       detectionMap = repmat(detectionMap, 1, Nrec);
-   else 
-       error( "Dimension inconnue ou non supportée" );
-       
+   switch dimensionFreq
+       case 1
+           Nrec         = size(imagetteChannelIQ_lin, 1); 
+           detectionMap = repmat(detectionMap, Nrec, 1);
+          
+       case 2
+           Nrec         = size(imagetteChannelIQ_lin, 2); 
+           detectionMap = repmat(detectionMap, 1, Nrec);
+           
+       otherwise
+           error( "Dimension inconnue ou non supportée" );
+           
    end
 
 end

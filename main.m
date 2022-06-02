@@ -4,22 +4,26 @@ close all;
 clear;
 dbstop if error;
 
+
 %% Chargement des données et des fonctions
 addpath(genpath( "./functions" ));
+
 
 %% Options du script
 displayFigures   = true;                                                   % affichage des figures, 1x1
 isCovarianceKown = false;                                                  % connaissance de la matrice de covariance du bruit thermique, 1x1
+
 
 %% Hyperparamètres
 kB  = 1.38e-23;                                                            % constante de Boltzmann, 1x1 [m2 kg s-2 K-1]
 c   = 3e8;                                                                 % célérité de la lumière, 1x1 [m/s]
 Pfa = 1e-4;                                                                % probabilité de fausse alarme, 1x1
 
+
 %% Paramètres
 % géométrie des cartes
-Nrec  = 64;                                                                % nombre de récurrences, 1x1
-Ncd   = 100;                                                               % nombre de cases distance-, 1x1
+Nrec  = 128;                                                               % nombre de récurrences, 1x1
+Ncd   = 150;                                                               % nombre de cases distance, 1x1
 Ncell = Nrec * Ncd;                                                        % nombre de cellules, 1x1
 
 % radar
@@ -46,13 +50,16 @@ speedTarget     = 5;                                                       % vit
 targetFrequency = 2 * speedTarget / lambda;                                % fréquence Doppler de la cible, 1x1 [Hz]   
 
 
+
 %% Imagette de bruit blanc complexe (channels I et Q)
 [ imagetteChannelIQ_lin,...
   imagetteAmplitude_lin,...
   imagettePuissance_lin    ] = createImagette( Pbth_lin,...
                                                Ncd,...
                                                Nrec        );
-                                           
+    
+
+
 %% Création de la cible 
 [ targetIQ,...
   targetAmplitude,...
@@ -63,6 +70,8 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
                                        typeTarget,...
                                        Nrec               );
 
+
+
 %% Ajout de la cible
 [ imagetteChannelIQWithTarget_lin,...
   imagetteAmplitudeWithTarget_lin,...
@@ -72,11 +81,14 @@ targetFrequency = 2 * speedTarget / lambda;                                % fr�
                                                     1                        );
 
 
+
 %% Calcul de la matrice de covariance
 scmR = calcCovarianceMatrix( imagetteChannelIQ_lin,...
                              R,...
                              isCovarianceKown,...
-                             1                                  );
+                             2                                  );
+
+
 
 %% Détecteur optimal
 [ logLRT_lin,...
@@ -88,6 +100,7 @@ scmR = calcCovarianceMatrix( imagetteChannelIQ_lin,...
                                        steringVector,...
                                        typeTarget,...
                                        1                                  ) ;    
+
 
 
 %% Figures

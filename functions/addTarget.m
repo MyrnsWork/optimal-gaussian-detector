@@ -3,19 +3,20 @@ function [ imagetteChannelIQ_lin,...
            imagettePuissance_lin,...
            rangeIndex               ] = addTarget( imagetteChannelIQ_lin,...
                                                    targetIQ,...
-                                                   dimensionRec             )
+                                                   dimensionFreq            )
                                                          
-   if dimensionRec == 1                                                      
-       rangeIndex = randi( size(imagetteChannelIQ_lin, 2) );
-       imagetteChannelIQ_lin(:, rangeIndex) = imagetteChannelIQ_lin(:, rangeIndex) + targetIQ;  
-      
-   elseif dimensionRec == 2
-       rangeIndex = randi( size(imagetteChannelIQ_lin, 1) );
-       imagetteChannelIQ_lin(rangeIndex, :) = imagetteChannelIQ_lin(rangeIndex, :) + targetIQ;  
-       
-   else 
-       error( "Dimension inconnue ou non supportée" );
-       
+   switch dimensionFreq
+       case 1
+           rangeIndex = randi( size(imagetteChannelIQ_lin, 2) );
+           imagetteChannelIQ_lin(:, rangeIndex) = imagetteChannelIQ_lin(:, rangeIndex) + targetIQ;  
+          
+       case 2
+           rangeIndex = randi( size(imagetteChannelIQ_lin, 1) );
+           imagetteChannelIQ_lin(rangeIndex, :) = imagetteChannelIQ_lin(rangeIndex, :) + targetIQ;  
+           
+       otherwise
+           error( "Dimension inconnue ou non supportée" );
+           
    end
    
    
