@@ -12,20 +12,22 @@ dbstop if error;
 
 
 %% Options du script
-displayFigures   = true;                                                   % affichage des figures, 1x1
-isCovarianceKown = false;                                                  % connaissance de la matrice de covariance du bruit thermique, 1x1
+displayFigures   = false;                                                  % affichage des figures, 1x1
+isCovarianceKown = true;                                                   % connaissance de la matrice de covariance du bruit thermique, 1x1
 
 
-%% Hyperparamètres
+%% Constantes
 kB  = 1.38e-23;                                                            % constante de Boltzmann, 1x1 [m2 kg s-2 K-1]
 c   = 3e8;                                                                 % célérité de la lumière, 1x1 [m/s]
-Pfa = 1e-4;                                                                % probabilité de fausse alarme, 1x1
 
 
 %% Paramètres
+% mode radar
+Pfa = 1e-4;                                                                % probabilité de fausse alarme, 1x1
+
 % géométrie des cartes
 Nrec  = 128;                                                               % nombre de récurrences, 1x1
-Ncd   = 150;                                                               % nombre de cases distance, 1x1
+Ncd   = 10000;                                                             % nombre de cases distance, 1x1
 Ncell = Nrec * Ncd;                                                        % nombre de cellules, 1x1
 
 % radar
@@ -47,7 +49,7 @@ R        = Pbth_lin * eye(Nrec);                                           % mat
 % caractéristiques de la cible
 SNR_dB          = 9;                                                       % rapport signal sur bruit, 1x1                                                                          
 SNR_lin         = 10^( SNR_dB/10 );
-typeTarget      = "swerling1";                                             % type de fluctuations de la cible, 1x1   
+typeTarget      = "swerling0";                                             % type de fluctuations de la cible, 1x1   
 speedTarget     = 5;                                                       % vitesse radiale de la cible, 1x1 [m/s]   
 targetFrequency = 2 * speedTarget / lambda;                                % fréquence Doppler de la cible, 1x1 [Hz]   
 
@@ -129,7 +131,6 @@ if displayFigures
 end
                       
 
-
 %% Fonctions
 % calculs
 function [ imagetteChannelIQ_lin,...
@@ -209,7 +210,7 @@ function [ targetIQ,...
         case "swerling1"                                                   % amplitude suivant une loi de Rayleigh, phase suivant une loi uniforme
             Tr              = 1/PRF;
             targetPower     = SNR_lin * Pbth_lin;
-            sigmaTarget     = sqrt( targetPower/2 );
+            sigmaTarget     = sqrt( targetPower );
             targetAmplitude = sigmaTarget * ( randn + 1j*randn );          % hypothèse : le tirage d'ampltitude est 
                                                                            % constant sur le temps d'intégration (Tint = Nrec/PRF )
             t               = (0 : Tr : (Nrec-1) * Tr)';  
@@ -220,7 +221,7 @@ function [ targetIQ,...
             Tr              = 1/PRF;
             targetPower     = SNR_lin * Pbth_lin;
             Phi             = 2 * pi * rand;                               % phase aléatoire uniforme sur l'intervalle [0;2pi]
-            sigmaTarget     = sqrt( targetPower/2 );
+            sigmaTarget     = sqrt( targetPower );
             targetAmplitude = sigmaTarget * exp(1j*Phi);                   % hypothèse : le tirage d'ampltitude est 
                                                                            % constant sur le temps d'intégration (Tint = Nrec/PRF )
             t               = (0 : Tr : (Nrec-1) * Tr)'; 
@@ -232,7 +233,7 @@ function [ targetIQ,...
             SNR_dB          = rand * 30 - 5;
             SNR_lin         = 10^( SNR_dB/10 );
             targetPower     = SNR_lin * Pbth_lin;                          % amplitude déterministe et inconnue
-            sigmaTarget     = sqrt( targetPower/2 );
+            sigmaTarget     = sqrt( targetPower );
             targetAmplitude = sigmaTarget * ( randn + 1j*randn );          % hypothèse : le tirage d'ampltitude est 
                                                                            % constant sur le temps d'intégration (Tint = Nrec/PRF )
             t               = (0 : Tr : (Nrec-1) * Tr)';   
