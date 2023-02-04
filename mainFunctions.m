@@ -12,7 +12,7 @@ dbstop if error;
 
 
 %% Options du script
-displayFigures   = false;                                                  % affichage des figures, 1x1
+displayFigures   = true;                                                   % affichage des figures, 1x1
 isCovarianceKown = true;                                                   % connaissance de la matrice de covariance du bruit thermique, 1x1
 
 

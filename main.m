@@ -49,7 +49,7 @@ Pbth_dB  = 10*log10( Pbth_lin );
 R        = Pbth_lin * eye(Nrec);                                           % matrice de covariance du bruit thermique, Nrec x Nrec
 
 % caractéristiques de la cible
-SNR_dB          = 9;                                                       % rapport signal sur bruit, 1x1                                                                          
+SNR_dB          = 15;                                                       % rapport signal sur bruit, 1x1                                                                          
 SNR_lin         = 10^( SNR_dB/10 );
 typeTarget      = "swerling1";                                             % type de fluctuations de la cible, 1x1   
 speedTarget     = 5;                                                       % vitesse radiale de la cible, 1x1 [m/s]   
